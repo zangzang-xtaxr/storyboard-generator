@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 分镜生成器</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app-container">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <i class="fas fa-film"></i>
+      <span>AI 分镜生成器</span>
+    </div>
+    <nav class="nav-menu">
+      <a href="#" class="nav-item active" data-step="1">
+        <i class="fas fa-user"></i><span>人物设定</span>
+      </a>
+      <a href="#" class="nav-item" data-step="2">
+        <i class="fas fa-scroll"></i><span>剧情脚本</span>
+      </a>
+      <a href="#" class="nav-item" data-step="3">
+        <i class="fas fa-th-large"></i><span>分镜脚本</span>
+      </a>
+      <a href="#" class="nav-item" data-step="4">
+        <i class="fas fa-image"></i><span>分镜图片</span>
+      </a>
+      <a href="#" class="nav-item" data-step="5">
+        <i class="fas fa-video"></i><span>视频生成</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-secondary" id="newProjectBtn" style="width:100%;justify-content:center;">
+        <i class="fas fa-plus"></i> 新建项目
+      </button>
+      <div class="sidebar-user" id="sidebarUserInfo"></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main-content">
+
+    <!-- HEADER -->
+    <header class="header">
+      <div class="header-left">
+        <h1 id="pageTitle">人物设定</h1>
+        <span class="project-id" id="projectId"></span>
+      </div>
+      <div class="header-right">
+        <button class="btn-icon" id="helpBtn" title="帮助"><i class="fas fa-question-circle"></i></button>
+        <button class="btn-icon" id="settingsBtn" title="设置"><i class="fas fa-cog"></i></button>
+      </div>
+    </header>
+
+    <!-- PROGRESS -->
+    <div class="progress-bar">
+      <div class="progress-step active" data-step="1"><div class="step-number">1</div><span>人物设定</span></div>
+      <div class="progress-line"></div>
+      <div class="progress-step" data-step="2"><div class="step-number">2</div><span>剧情脚本</span></div>
+      <div class="progress-line"></div>
+      <div class="progress-step" data-step="3"><div class="step-number">3</div><span>分镜脚本</span></div>
+      <div class="progress-line"></div>
+      <div class="progress-step" data-step="4"><div class="step-number">4</div><span>分镜图片</span></div>
+      <div class="progress-line"></div>
+      <div class="progress-step" data-step="5"><div class="step-number">5</div><span>视频生成</span></div>
+    </div>
+
+    <!-- CONTENT AREA -->
+    <div class="content-area">
+      <!-- STEP 1: 人物设定 -->
+      <div class="step-content active" id="step1">
+        <div class="upload-section">
+          <p class="section-label">Step 01</p>
+          <h2>上传人物三视图</h2>
+          <p class="subtitle">上传正面、侧面和背面视图，AI 将提取角色特征以保持后续生成的一致性</p>
+          <div class="upload-grid">
+            <div class="upload-card" data-view="front">
+              <div class="upload-area" id="frontUpload">
+                <input type="file" accept="image/*" id="frontInput" hidden>
+                <div class="upload-placeholder">
+                  <i class="fas fa-user"></i>
+                  <span>正面视图</span>
+                  <small>点击或拖拽上传</small>
+                </div>
+                <div class="upload-preview hidden">
+                  <img src="" alt="正面视图">
+                  <button class="remove-btn"><i class="fas fa-times"></i></button>
+                </div>
+              </div>
+            </div>
+            <div class="upload-card" data-view="side">
+              <div class="upload-area" id="sideUpload">
+                <input type="file" accept="image/*" id="sideInput" hidden>
+                <div class="upload-placeholder">
+                  <i class="fas fa-user"></i>
+                  <span>侧面视图</span>
+                  <small>点击或拖拽上传</small>
+                </div>
+                <div class="upload-preview hidden">
+                  <img src="" alt="侧面视图">
+                  <button class="remove-btn"><i class="fas fa-times"></i></button>
+                </div>
+              </div>
+            </div>
+            <div class="upload-card" data-view="back">
+              <div class="upload-area" id="backUpload">
+                <input type="file" accept="image/*" id="backInput" hidden>
+                <div class="upload-placeholder">
+                  <i class="fas fa-user"></i>
+                  <span>背面视图</span>
+                  <small>点击或拖拽上传</small>
+                </div>
+                <div class="upload-preview hidden">
+                  <img src="" alt="背面视图">
+                  <button class="remove-btn"><i class="fas fa-times"></i></button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="character-info">
+            <h3>人物信息（选填）</h3>
+            <div class="form-row" style="margin-top:14px;">
+              <div class="form-group">
+                <label>人物名称</label>
+                <input type="text" id="characterName" placeholder="例如：主角小明">
+              </div>
+              <div class="form-group">
+                <label>人物特征描述</label>
+                <input type="text" id="characterDesc" placeholder="例如：20岁男性，短发，戴眼镜">
+              </div>
+            </div>
+          </div>
+          <div class="action-bar">
+            <button class="btn-primary" id="uploadCharacterBtn" disabled>
+              <i class="fas fa-upload"></i> 上传并继续
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: 剧情脚本 -->
+      <div class="step-content" id="step2">
+        <div class="script-section">
+          <p class="section-label">Step 02</p>
+          <h2>输入剧情脚本</h2>
+          <p class="subtitle">输入你的剧情内容，AI 将自动解析并生成分镜脚本</p>
+          <div class="script-tabs">
+            <button class="tab-btn active" data-tab="simple">简单描述</button>
+            <button class="tab-btn" data-tab="detailed">详细剧本</button>
+            <button class="tab-btn" data-tab="scene">分场景</button>
+          </div>
+          <div class="script-input-area">
+            <div class="tab-content active" id="simpleTab">
+              <textarea id="simpleScript" placeholder="用简单的语言描述你的剧情...
+
+例如：
+主角早上起床，发现窗外下雪了。他兴奋地穿上衣服跑出去玩雪，堆了一个大雪人。傍晚时分，他和雪人告别，回家吃晚饭。"></textarea>
+            </div>
+            <div class="tab-content" id="detailedTab">
+              <textarea id="detailedScript" placeholder="输入详细剧本格式...
+
+场景1：卧室 - 早晨
+【闹钟响起，主角从床上坐起，揉揉眼睛】
+主角：（打哈欠）又是新的一天..."></textarea>
+            </div>
+            <div class="tab-content" id="sceneTab">
+              <div class="scene-list" id="sceneList">
+                <div class="scene-item">
+                  <div class="scene-header">
+                    <span class="scene-num">场景 01</span>
+                    <button class="remove-scene btn-icon"><i class="fas fa-trash"></i></button>
+                  </div>
+                  <input type="text" class="scene-location" placeholder="地点 — 例如：卧室 / 早晨">
+                  <textarea class="scene-desc" placeholder="场景描述..."></textarea>
+                </div>
+              </div>
+              <button class="btn-secondary" id="addSceneBtn" style="margin-top:10px;">
+                <i class="fas fa-plus"></i> 添加场景
+              </button>
+            </div>
+          </div>
+          <div class="script-options">
+            <label class="checkbox-label">
+              <input type="checkbox" id="autoCamera" checked><span>自动推荐镜头角度</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="estimateDuration" checked><span>估算场景时长</span>
+            </label>
+          </div>
+          <div class="action-bar">
+            <button class="btn-secondary" onclick="goToStep(1)">返回</button>
+            <button class="btn-primary" id="submitScriptBtn">
+              <i class="fas fa-magic"></i> 生成分镜脚本
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3: 分镜脚本 -->
+      <div class="step-content" id="step3">
+        <div class="storyboard-section">
+          <div class="section-header">
+            <div><p class="section-label">Step 03</p><h2>分镜脚本</h2></div>
+            <div class="section-actions">
+              <button class="btn-secondary" id="editScriptBtn"><i class="fas fa-edit"></i> 编辑</button>
+              <button class="btn-secondary" id="exportScriptBtn"><i class="fas fa-download"></i> 导出</button>
+            </div>
+          </div>
+          <p class="subtitle">AI 生成的分镜脚本，可编辑每个镜头的细节</p>
+          <div class="storyboard-toolbar">
+            <button class="btn-icon" id="addShotBtn" title="添加镜头"><i class="fas fa-plus"></i></button>
+            <button class="btn-icon" id="reorderBtn" title="重新排序"><i class="fas fa-random"></i></button>
+            <div class="toolbar-divider"></div>
+            <button class="btn-icon" id="previewBtn" title="预览"><i class="fas fa-play"></i></button>
+          </div>
+          <div class="storyboard-grid" id="storyboardGrid"></div>
+          <div class="action-bar">
+            <button class="btn-secondary" onclick="goToStep(2)">返回</button>
+            <button class="btn-primary" id="generateImagesBtn"><i class="fas fa-image"></i> 生成分镜图</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4: 分镜图片 -->
+      <div class="step-content" id="step4">
+        <div class="images-section">
+          <div class="section-header">
+            <div><p class="section-label">Step 04</p><h2>分镜图片</h2></div>
+            <div class="section-actions">
+              <select id="styleSelect" class="select-styled">
+                <option value="anime">动漫风格</option>
+                <option value="realistic">写实风格</option>
+                <option value="watercolor">水彩风格</option>
+                <option value="sketch">素描风格</option>
+                <option value="pixel">像素风格</option>
+              </select>
+              <button class="btn-secondary" id="regenerateAllBtn"><i class="fas fa-redo"></i> 全部重绘</button>
+            </div>
+          </div>
+          <p class="subtitle">基于人物三视图生成的、保持角色一致性的分镜图</p>
+          <div class="generation-status" id="generationStatus">
+            <div class="progress-ring">
+              <svg viewBox="0 0 100 100">
+                <circle class="progress-bg" cx="50" cy="50" r="45"></circle>
+                <circle class="progress-bar" cx="50" cy="50" r="45" id="progressCircle"></circle>
+              </svg>
+              <span class="progress-text" id="progressText">0%</span>
+            </div>
+            <span class="status-text" id="statusText">准备生成...</span>
+          </div>
+          <div class="images-grid" id="imagesGrid"></div>
+          <div class="action-bar">
+            <button class="btn-secondary" onclick="goToStep(3)">返回</button>
+            <button class="btn-primary" id="generateVideosBtn"><i class="fas fa-video"></i> 生成视频</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 5: 视频生成 -->
+      <div class="step-content" id="step5">
+        <div class="video-section">
+          <div class="section-header">
+            <div><p class="section-label">Step 05</p><h2>视频生成</h2></div>
+            <div class="section-actions">
+              <button class="btn-secondary" id="exportVideoBtn"><i class="fas fa-download"></i> 导出完整视频</button>
+            </div>
+          </div>
+          <p class="subtitle">将分镜图转换为动态视频片段</p>
+          <div class="video-options">
+            <div class="option-group">
+              <label>视频时长（秒 / 场景）</label>
+              <input type="range" id="videoDuration" min="1" max="10" value="3" step="0.5">
+              <span id="durationValue">3 秒</span>
+            </div>
+            <div class="option-group">
+              <label>运动强度</label>
+              <input type="range" id="motionStrength" min="0" max="100" value="50">
+              <span id="motionValue">中等</span>
+            </div>
+            <div class="option-group">
+              <label>帧率</label>
+              <select id="fpsSelect">
+                <option value="24">24 fps — 电影感</option>
+                <option value="30">30 fps — 标准</option>
+                <option value="60">60 fps — 流畅</option>
+              </select>
+            </div>
+          </div>
+          <div class="video-grid" id="videoGrid"></div>
+          <div class="action-bar">
+            <button class="btn-secondary" onclick="goToStep(4)">返回</button>
+            <button class="btn-primary" id="generateAllVideosBtn"><i class="fas fa-film"></i> 生成全部视频</button>
+          </div>
+        </div>
+      </div>
+    </div><!-- /content-area -->
+  </main>
+</div><!-- /app-container -->
+<!-- SHOT MODAL -->
+<div class="modal" id="shotModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>编辑分镜</h3>
+      <button class="close-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label>场景编号</label><input type="text" id="editShotNumber" readonly></div>
+      <div class="form-group"><label>场景地点</label><input type="text" id="editShotLocation"></div>
+      <div class="form-group"><label>场景描述</label><textarea id="editShotDesc" rows="3"></textarea></div>
+      <div class="form-group"><label>动作描述</label><textarea id="editShotAction" rows="2"></textarea></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>镜头类型</label>
+          <select id="editShotCamera">
+            <option value="全景">全景</option>
+            <option value="中景">中景</option>
+            <option value="近景">近景</option>
+            <option value="特写">特写</option>
+            <option value="大特写">大特写</option>
+            <option value="俯视">俯视</option>
+            <option value="仰视">仰视</option>
+          </select>
+        </div>
+        <div class="form-group"><label>时长（秒）</label><input type="number" id="editShotDuration" min="1" max="60" value="3"></div>
+      </div>
+      <div class="form-group"><label>对白</label><textarea id="editShotDialogue" rows="2"></textarea></div>
+      <div class="form-group"><label>备注</label><input type="text" id="editShotNotes"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal()">取消</button>
+      <button class="btn-primary" onclick="saveShot()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- IMAGE PREVIEW MODAL -->
+<div class="modal" id="imageModal">
+  <div class="modal-content modal-large">
+    <div class="modal-header">
+      <h3>分镜图预览</h3>
+      <button class="close-btn" onclick="closeImageModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="image-preview-container">
+        <img src="" alt="分镜图" id="previewImage">
+      </div>
+      <div class="image-info">
+        <p><strong>生成提示词</strong><span id="imagePrompt"></span></p>
+        <p><strong>种子</strong><span id="imageSeed"></span></p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="regenerateImage()"><i class="fas fa-redo"></i> 重新生成</button>
+      <button class="btn-primary" onclick="downloadImage()"><i class="fas fa-download"></i> 下载</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner">
+    <div class="spinner"></div>
+    <p id="loadingText">处理中...</p>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- AUTH OVERLAY -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <span class="auth-brand-icon">🎬</span>
+      <span class="auth-brand-name">AI 分镜生成器</span>
+    </div>
+    <h2 class="auth-title" id="authTitle">欢迎回来</h2>
+    <p class="auth-subtitle" id="authSubtitle">登录账号以继续创作</p>
+    <div class="auth-tabs">
+      <button class="auth-tab auth-tab--active" id="authTabLogin">登录</button>
+      <button class="auth-tab" id="authTabRegister">注册</button>
+    </div>
+    <!-- 登录表单 -->
+    <form class="auth-form" id="authLoginForm" novalidate>
+      <div class="auth-field">
+        <label class="auth-label" for="loginEmail">邮箱</label>
+        <input class="auth-input" type="email" id="loginEmail" placeholder="your@email.com" autocomplete="email">
+        <span class="auth-error" id="loginEmailError"></span>
+      </div>
+      <div class="auth-field">
+        <label class="auth-label" for="loginPassword">密码</label>
+        <input class="auth-input" type="password" id="loginPassword" placeholder="请输入密码" autocomplete="current-password">
+        <span class="auth-error" id="loginPasswordError"></span>
+      </div>
+      <button class="auth-submit-btn" type="submit">登 录</button>
+    </form>
+    <!-- 注册表单 -->
+    <form class="auth-form auth-form--hidden" id="authRegisterForm" novalidate>
+      <div class="auth-field">
+        <label class="auth-label" for="registerUsername">用户名</label>
+        <input class="auth-input" type="text" id="registerUsername" placeholder="你的昵称" autocomplete="username">
+        <span class="auth-error" id="registerUsernameError"></span>
+      </div>
+      <div class="auth-field">
+        <label class="auth-label" for="registerEmail">邮箱</label>
+        <input class="auth-input" type="email" id="registerEmail" placeholder="your@email.com" autocomplete="email">
+        <span class="auth-error" id="registerEmailError"></span>
+      </div>
+      <div class="auth-field">
+        <label class="auth-label" for="registerPassword">密码</label>
+        <input class="auth-input" type="password" id="registerPassword" placeholder="至少 6 个字符" autocomplete="new-password">
+        <span class="auth-error" id="registerPasswordError"></span>
+      </div>
+      <div class="auth-field">
+        <label class="auth-label" for="registerConfirm">确认密码</label>
+        <input class="auth-input" type="password" id="registerConfirm" placeholder="再次输入密码" autocomplete="new-password">
+        <span class="auth-error" id="registerConfirmError"></span>
+      </div>
+      <button class="auth-submit-btn" type="submit">注 册</button>
+    </form>
+  </div>
+</div>
+<script src="api-client.js"></script>
+<script src="auth.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+# =====================================================
+# Fly.io 部署配置
+# 部署命令: fly launch && fly deploy
+# =====================================================
+
+app = "storyboard-app"
+primary_region = "nrt"   # 东京，亚太延迟最低
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  NODE_ENV    = "production"
+  PORT        = "3000"
+  STORAGE_MODE = "file"
+
+[http_service]
+  internal_port       = 3000
+  force_https         = true
+  auto_stop_machines  = true
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [http_service.concurrency]
+    type       = "connections"
+    hard_limit = 100
+    soft_limit = 80
+
+[[vm]]
+  memory = "512mb"
+  cpu_kind = "shared"
+  cpus = 1
+
+[mounts]
+  source      = "storyboard_uploads"
+  destination = "/app/uploads"
+
+[[services.http_checks]]
+  interval      = "15s"
+  timeout       = "10s"
+  grace_period  = "10s"
+  method        = "GET"
+  path          = "/api/health"
+  protocol      = "http"

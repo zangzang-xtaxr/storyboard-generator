@@ -1,0 +1,37 @@
+# 版本控制
+.git
+.gitignore
+
+# 依赖（镜像内重新安装）
+node_modules
+
+# 上传/输出目录（运行时数据）
+uploads/
+outputs/
+
+# 备份文件
+backups/
+*.json.bak
+
+# 开发配置
+.env
+.env.local
+.env.development
+
+# 日志
+*.log
+npm-debug.log*
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 操作系统
+.DS_Store
+Thumbs.db
+
+# 文档（可选，减少镜像体积）
+*.md
+!README.md

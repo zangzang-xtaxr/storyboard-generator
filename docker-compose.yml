@@ -1,0 +1,67 @@
+# =====================================================
+# Docker Compose - 本地生产环境测试
+# 用法: docker-compose up -d
+# =====================================================
+
+version: '3.9'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: storyboard-app
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - STORAGE_MODE=${STORAGE_MODE:-file}
+      - MONGODB_URI=mongodb://mongo:27017/storyboard-app
+      - JWT_SECRET=${JWT_SECRET}
+      - CLAUDE_API_KEY=${CLAUDE_API_KEY}
+      - CORS_ORIGIN=${CORS_ORIGIN:-http://localhost:3000}
+      - MAX_FILE_SIZE=${MAX_FILE_SIZE:-52428800}
+    volumes:
+      - uploads_data:/app/uploads
+      - outputs_data:/app/outputs
+      - backups_data:/app/backups
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - storyboard-network
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  mongo:
+    image: mongo:7-jammy
+    container_name: storyboard-mongo
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_DATABASE=storyboard-app
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - storyboard-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  uploads_data:
+  outputs_data:
+  backups_data:
+  mongo_data:
+
+networks:
+  storyboard-network:
+    driver: bridge

@@ -1,0 +1,44 @@
+# =====================================================
+# Render.com 部署配置
+# 文档: https://render.com/docs/blueprint-spec
+# =====================================================
+
+services:
+  - type: web
+    name: storyboard-app
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter          # free / starter / standard
+    region: singapore      # 亚太区域，延迟更低
+    branch: main
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: STORAGE_MODE
+        value: mongodb
+      - key: MONGODB_URI
+        fromDatabase:
+          name: storyboard-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true   # Render 自动生成随机值
+      - key: CLAUDE_API_KEY
+        sync: false           # 在 Render Dashboard 手动填写
+      - key: CORS_ORIGIN
+        value: https://storyboard-app.onrender.com
+      - key: MAX_FILE_SIZE
+        value: 52428800
+    disk:
+      name: uploads
+      mountPath: /app/uploads
+      sizeGB: 5
+    healthCheckPath: /api/health
+    autoDeploy: true
+
+databases:
+  - name: storyboard-db
+    plan: free
+    databaseName: storyboard_app
+    region: singapore
